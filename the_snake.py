@@ -20,19 +20,20 @@ GAME_OVER_COLOR = (255, 255, 255)
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
 pygame.display.set_caption('Змейка')
-
 clock = pygame.time.Clock()
+
 
 class GameObject:
     def __init__(self, position=(0, 0)):
         self.position = position
-        self.body_color = None 
+        self.body_color = None
 
     def draw(self):
         raise NotImplementedError()
 
 
 class Apple(GameObject):
+
     def __init__(self):
         super().__init__(self.randomize_position())
         self.body_color = APPLE_COLOR
@@ -50,8 +51,9 @@ class Apple(GameObject):
 
 
 class Snake(GameObject):
+
     def __init__(self, initial_position=(GRID_WIDTH // 2 * GRID_SIZE,
-                                          GRID_HEIGHT // 2 * GRID_SIZE)):
+                                         GRID_HEIGHT // 2 * GRID_SIZE)):
         super().__init__(initial_position)
         self.body = [self.position]
         self.direction = (1, 0)
@@ -62,7 +64,6 @@ class Snake(GameObject):
             self.body[0][0] + self.direction[0] * GRID_SIZE,
             self.body[0][1] + self.direction[1] * GRID_SIZE,
         )
-
         if new_position[0] < 0:
             new_position = (SCREEN_WIDTH - GRID_SIZE, new_position[1])
         elif new_position[0] >= SCREEN_WIDTH:
@@ -94,7 +95,8 @@ class Snake(GameObject):
 
     def check_collision(self):
         head = self.get_head_position()
-        if head[0] < 0 or head[0] >= SCREEN_WIDTH or head[1] < 0 or head[1] >= SCREEN_HEIGHT:
+        if (head[0] < 0 or head[0] >= SCREEN_WIDTH
+           or head[1] < 0 or head[1] >= SCREEN_HEIGHT):
             return True
         if head in self.body[1:]:
             return True
@@ -122,26 +124,27 @@ def handle_keys(snake):
 
 
 def show_game_over():
+    """Display the game over message."""
     font = pygame.font.SysFont('Arial', 36)
     text = font.render('Game Over!', True, GAME_OVER_COLOR)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2,
-                        SCREEN_HEIGHT // 2 - text.get_height() // 2))
+                       SCREEN_HEIGHT // 2 - text.get_height() // 2))
     pygame.display.update()
     pygame.time.wait(2000)
 
 
 def main():
+    """Main function to run the game."""
     snake = Snake()
     apple = Apple()
 
     while True:
         handle_keys(snake)
-
         snake.move()
 
         if snake.check_collision():
             show_game_over()
-            break 
+            break
 
         if snake.get_head_position() == apple.position:
             snake.grow()
