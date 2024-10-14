@@ -15,6 +15,7 @@ BOARD_BACKGROUND_COLOR = (0, 0, 0)
 BORDER_COLOR = (93, 216, 228)
 APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
+GAME_OVER_COLOR = (255, 255, 255)
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
@@ -22,9 +23,7 @@ pygame.display.set_caption('Змейка')
 
 clock = pygame.time.Clock()
 
-
 class GameObject:
-
     def __init__(self, position=(0, 0)):
         self.position = position
         self.body_color = None 
@@ -34,7 +33,6 @@ class GameObject:
 
 
 class Apple(GameObject):
-
     def __init__(self):
         super().__init__(self.randomize_position())
         self.body_color = APPLE_COLOR
@@ -52,12 +50,10 @@ class Apple(GameObject):
 
 
 class Snake(GameObject):
-
     def __init__(self, initial_position=(GRID_WIDTH // 2 * GRID_SIZE,
                                           GRID_HEIGHT // 2 * GRID_SIZE)):
         super().__init__(initial_position)
         self.body = [self.position]
-        self.positions = self.body
         self.direction = (1, 0)
         self.body_color = SNAKE_COLOR
 
@@ -66,9 +62,17 @@ class Snake(GameObject):
             self.body[0][0] + self.direction[0] * GRID_SIZE,
             self.body[0][1] + self.direction[1] * GRID_SIZE,
         )
+
+        if new_position[0] < 0:
+            new_position = (SCREEN_WIDTH - GRID_SIZE, new_position[1])
+        elif new_position[0] >= SCREEN_WIDTH:
+            new_position = (0, new_position[1])
+        elif new_position[1] < 0:
+            new_position = (new_position[0], SCREEN_HEIGHT - GRID_SIZE)
+        elif new_position[1] >= SCREEN_HEIGHT:
+            new_position = (new_position[0], 0)
+
         self.body.insert(0, new_position)
-        self.position = new_position
-        self.positions = self.body
 
         if len(self.body) > 1:
             self.body.pop()
@@ -81,7 +85,6 @@ class Snake(GameObject):
 
     def grow(self):
         self.body.append(self.body[-1])
-        self.positions = self.body 
 
     def get_head_position(self):
         return self.body[0]
@@ -89,9 +92,15 @@ class Snake(GameObject):
     def move(self):
         self.update()
 
-    def reset(self):
-        self.body = [self.position]
-        self.direction = (1, 0)
+    def check_collision(self):
+        head = self.get_head_position()
+        # Check wall collisions
+        if head[0] < 0 or head[0] >= SCREEN_WIDTH or head[1] < 0 or head[1] >= SCREEN_HEIGHT:
+            return True
+        # Check self-collision
+        if head in self.body[1:]:
+            return True
+        return False
 
     def update_direction(self, new_direction):
         if (new_direction[0] * -1, new_direction[1] * -1) != self.direction:
@@ -114,6 +123,14 @@ def handle_keys(snake):
                 snake.update_direction(RIGHT)
 
 
+def show_game_over():
+    font = pygame.font.SysFont('Arial', 36)
+    text = font.render('Game Over!', True, GAME_OVER_COLOR)
+    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - text.get_height() // 2))
+    pygame.display.update()
+    pygame.time.wait(2000)
+
+
 def main():
     snake = Snake()
     apple = Apple()
@@ -122,6 +139,10 @@ def main():
         handle_keys(snake)
 
         snake.move()
+
+        if snake.check_collision():
+            show_game_over()
+            break 
 
         if snake.get_head_position() == apple.position:
             snake.grow()
@@ -135,5 +156,5 @@ def main():
         clock.tick(10)
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     main()
