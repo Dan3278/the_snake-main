@@ -53,12 +53,12 @@ class Apple(GameObject):
 class Snake(GameObject):
 
     def __init__(self, initial_position=(GRID_WIDTH // 2 * GRID_SIZE,
-                                         GRID_HEIGHT // 2 * GRID_SIZE)):
+                                          GRID_HEIGHT // 2 * GRID_SIZE)):
         super().__init__(initial_position)
         self.body = [self.position]
         self.direction = (1, 0)
         self.body_color = SNAKE_COLOR
-
+        self.positions = self.body.copy()
     def update(self):
         new_position = (
             self.body[0][0] + self.direction[0] * GRID_SIZE,
@@ -74,6 +74,7 @@ class Snake(GameObject):
             new_position = (new_position[0], 0)
 
         self.body.insert(0, new_position)
+        self.positions = self.body.copy()
 
         if len(self.body) > 1:
             self.body.pop()
@@ -86,6 +87,7 @@ class Snake(GameObject):
 
     def grow(self):
         self.body.append(self.body[-1])
+        self.positions = self.body.copy()
 
     def get_head_position(self):
         return self.body[0]
@@ -95,8 +97,7 @@ class Snake(GameObject):
 
     def check_collision(self):
         head = self.get_head_position()
-        if (head[0] < 0 or head[0] >= SCREEN_WIDTH
-           or head[1] < 0 or head[1] >= SCREEN_HEIGHT):
+        if head[0] < 0 or head[0] >= SCREEN_WIDTH or head[1] < 0 or head[1] >= SCREEN_HEIGHT:
             return True
         if head in self.body[1:]:
             return True
@@ -105,6 +106,11 @@ class Snake(GameObject):
     def update_direction(self, new_direction):
         if (new_direction[0] * -1, new_direction[1] * -1) != self.direction:
             self.direction = new_direction
+
+    def reset(self):
+        self.body = [self.position]
+        self.direction = (1, 0)
+        self.positions = self.body.copy()
 
 
 def handle_keys(snake):
@@ -124,17 +130,20 @@ def handle_keys(snake):
 
 
 def show_game_over():
-    """Display the game over message."""
     font = pygame.font.SysFont('Arial', 36)
     text = font.render('Game Over!', True, GAME_OVER_COLOR)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2,
-                       SCREEN_HEIGHT // 2 - text.get_height() // 2))
+    screen.blit(
+        text,
+        (
+            SCREEN_WIDTH // 2 - text.get_width() // 2,
+            SCREEN_HEIGHT // 2 - text.get_height() // 2
+        )
+    )
     pygame.display.update()
     pygame.time.wait(2000)
 
 
 def main():
-    """Main function to run the game."""
     snake = Snake()
     apple = Apple()
 
