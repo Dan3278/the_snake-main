@@ -94,10 +94,8 @@ class Snake(GameObject):
 
     def check_collision(self):
         head = self.get_head_position()
-        # Check wall collisions
         if head[0] < 0 or head[0] >= SCREEN_WIDTH or head[1] < 0 or head[1] >= SCREEN_HEIGHT:
             return True
-        # Check self-collision
         if head in self.body[1:]:
             return True
         return False
@@ -126,7 +124,8 @@ def handle_keys(snake):
 def show_game_over():
     font = pygame.font.SysFont('Arial', 36)
     text = font.render('Game Over!', True, GAME_OVER_COLOR)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - text.get_height() // 2))
+    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2,
+                        SCREEN_HEIGHT // 2 - text.get_height() // 2))
     pygame.display.update()
     pygame.time.wait(2000)
 
