@@ -114,7 +114,8 @@ class Snake(GameObject):
     def check_collision(self):
         """Переместит змейку, изменив ее положение."""
         head = self.get_head_position()
-        if head[0] < 0 or head[0] >= SCREEN_WIDTH or head[1] < 0 or head[1] >= SCREEN_HEIGHT:
+        SCREEN_DIM = (SCREEN_WIDTH, SCREEN_HEIGHT)
+        if any(coord < 0 or coord >= dim for coord, dim in zip(head, SCREEN_DIM)):
             return True
         if head in self.body[1:]:
             return True
