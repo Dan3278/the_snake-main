@@ -115,7 +115,8 @@ class Snake(GameObject):
         """Переместит змейку, изменив ее положение."""
         head = self.get_head_position()
         SCREEN_DIM = (SCREEN_WIDTH, SCREEN_HEIGHT)
-        if any(coord < 0 or coord >= dim for coord, dim in zip(head, SCREEN_DIM)):
+        if any(coord < 0 or coord >= dim for coord,
+                dim in zip(head, SCREEN_DIM)):
             return True
         if head in self.body[1:]:
             return True
