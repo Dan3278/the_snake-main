@@ -123,10 +123,7 @@ class Snake(GameObject):
         return False
 
     def update_direction(self, new_direction):
-        """Измените направление движения змеи,
-            если оно не противоположно текущему
-            направлению.
-        """
+        """Измените направление движения змеи"""
         if (new_direction[0] * -1, new_direction[1] * -1) != self.direction:
             self.direction = new_direction
 
